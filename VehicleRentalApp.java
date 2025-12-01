@@ -1,148 +1,131 @@
+// VehicleRentalApp.java
 import java.util.Scanner;
-import java.time.LocalDate;
 
 public class VehicleRentalApp {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        RentalSystem rentalSystem = new RentalSystem();
+        RentalSystem rentalSystem = RentalSystem.getInstance();
 
         while (true) {
-        	System.out.println("\n1: Add Vehicle\n" + 
-                                  "2: Add Customer\n" + 
-                                  "3: Rent Vehicle\n" + 
-                                  "4: Return Vehicle\n" + 
-                                  "5: Display Available Vehicles\n" + 
-                                  "6: Show Rental History\n" + 
-                                  "0: Exit\n");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+            System.out.println();
+            System.out.println("Vehicle Rental System - Menu");
+            System.out.println("1: Add Vehicle");
+            System.out.println("2: Rent Vehicle");
+            System.out.println("3: Return Vehicle");
+            System.out.println("4: Display Available Vehicles");
+            System.out.println("5: Exit");
+            System.out.print("Select option (1-5): ");
 
-            switch (choice) {
-                case 1:
-                    System.out.println("  1: Car\n" + 
-                                       "  2: Minibus\n" + 
-                                       "  3: Pickup Truck");
-                    int type = scanner.nextInt();
-                    scanner.nextLine();
+            String line = scanner.nextLine().trim();
+            int choice;
+            try {
+                choice = Integer.parseInt(line);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid selection. Please enter a number 1-5.");
+                continue;
+            }
 
-                    System.out.print("Enter license plate: ");
-                    String plate = scanner.nextLine().toUpperCase();
+            if (choice == 1) {
+                System.out.println("Select vehicle type: 1: Car  2: Minibus");
+                String typeLine = scanner.nextLine().trim();
+                int type;
+                try {
+                    type = Integer.parseInt(typeLine);
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid selection.");
+                    continue;
+                }
+
+                if (type == 1) { // Car
+                    System.out.print("Enter licensePlate: ");
+                    String plate = scanner.nextLine().trim();
                     System.out.print("Enter make: ");
-                    String make = scanner.nextLine();
+                    String make = scanner.nextLine().trim();
                     System.out.print("Enter model: ");
-                    String model = scanner.nextLine();
+                    String model = scanner.nextLine().trim();
                     System.out.print("Enter year: ");
-                    int year = scanner.nextInt();
-                    scanner.nextLine();
+                    int year;
+                    try {
+                        year = Integer.parseInt(scanner.nextLine().trim());
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid year.");
+                        continue;
+                    }
+                    System.out.print("Enter numSeats: ");
+                    int numSeats;
+                    try {
+                        numSeats = Integer.parseInt(scanner.nextLine().trim());
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid number of seats.");
+                        continue;
+                    }
 
                     Vehicle vehicle;
-                    if (type == 1) {
-                        System.out.print("Enter number of seats: ");
-                        int seats = scanner.nextInt();
-                        vehicle = new Car(make, model, year, seats);
-                        System.out.println("Car added successfully.");
-                    } else if (type == 2) {
-                        System.out.print("Is accessible? (true/false): ");
-                        boolean isAccessible = scanner.nextBoolean();
-                        vehicle = new Minibus(make, model, year, isAccessible);
-                        System.out.println("Minibus added successfully.");
-		            } else if (type == 3) {
-		                System.out.print("Enter the cargo size: ");
-		                double cargoSize = scanner.nextDouble();
-		                scanner.nextLine();
-		                System.out.print("Has trailer? (true/false): ");
-		                boolean hasTrailer = scanner.nextBoolean();
-		                vehicle = new PickupTruck(make, model, year, cargoSize, hasTrailer);
-		                System.out.println("Pickup Truck added successfully.");
-		            } else {
-		            	vehicle = null;
-		            }
-                    
-                    if (vehicle != null){
-	                    vehicle.setLicensePlate(plate);
-	                    rentalSystem.addVehicle(vehicle);
+                    try {
+                        vehicle = new Car(make, model, year, numSeats);
+                    } catch (IllegalArgumentException ex) {
+                        System.out.println("Error: " + ex.getMessage());
+                        continue;
                     }
-                    else {
-	                    System.out.println("Vehicle not added successfully.");
+                    vehicle.setLicensePlate(plate);
+                    boolean added = rentalSystem.addVehicle(vehicle);
+                    if (added) System.out.println("Car has been added successfully.");
+                    else System.out.println("Add failed: duplicate plate or invalid data.");
+
+                } else if (type == 2) { // Minibus
+                    System.out.print("Enter licensePlate: ");
+                    String plate = scanner.nextLine().trim();
+                    System.out.print("Enter make: ");
+                    String make = scanner.nextLine().trim();
+                    System.out.print("Enter model: ");
+                    String model = scanner.nextLine().trim();
+                    System.out.print("Enter year: ");
+                    int year;
+                    try {
+                        year = Integer.parseInt(scanner.nextLine().trim());
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid year.");
+                        continue;
                     }
-                    break;
+                    System.out.print("Is accessible (yes/no): ");
+                    String acc = scanner.nextLine().trim().toLowerCase();
+                    boolean isAccessible = acc.equals("yes") || acc.equals("y") || acc.equals("true");
 
-                case 2:
-                    System.out.print("Enter customer ID: ");
-                    int cid = scanner.nextInt();
-                    scanner.nextLine(); // Consume the leftover newline
-                    System.out.print("Enter name: ");
-                    String cname = scanner.nextLine();
+                    Vehicle vehicle = new Minibus(make, model, year, isAccessible);
+                    vehicle.setLicensePlate(plate);
+                    boolean added = rentalSystem.addVehicle(vehicle);
+                    if (added) System.out.println("Minibus has been added successfully.");
+                    else System.out.println("Add failed: duplicate plate or invalid data.");
 
-                    rentalSystem.addCustomer(new Customer(cid, cname));
-                    System.out.println("Customer added successfully.");
-                    break;
-                    
-                case 3:
-                	rentalSystem.displayVehicles(Vehicle.VehicleStatus.Available);
+                } else {
+                    System.out.println("Invalid vehicle type selection.");
+                }
 
-                    System.out.print("Enter license plate: ");
-                    String rentPlate = scanner.nextLine().toUpperCase();
+            } else if (choice == 2) { // Rent
+                System.out.print("Enter licensePlate to rent: ");
+                String plate = scanner.nextLine().trim();
+                System.out.print("Enter customerName: ");
+                String name = scanner.nextLine().trim();
+                boolean ok = rentalSystem.rentVehicle(plate, name);
+                if (ok) System.out.println("Renting successful.");
+                else System.out.println("Renting failed (not available or not found).");
 
-                	System.out.println("Registered Customers:");
-                	rentalSystem.displayAllCustomers();
+            } else if (choice == 3) { // Return
+                System.out.print("Enter licensePlate to return: ");
+                String plate = scanner.nextLine().trim();
+                boolean ok = rentalSystem.returnVehicle(plate);
+                if (ok) System.out.println("Return successful.");
+                else System.out.println("Return failed (not rented or not found).");
 
-                    System.out.print("Enter customer ID: ");
-                    int cidRent = scanner.nextInt();
+            } else if (choice == 4) { // Display available
+                rentalSystem.displayAvailableVehicles();
 
-                    System.out.print("Enter rental amount: ");
-                    double rentAmount = scanner.nextDouble();
-                    scanner.nextLine();
-
-                    Vehicle vehicleToRent = rentalSystem.findVehicleByPlate(rentPlate);
-                    Customer customerToRent = rentalSystem.findCustomerById(cidRent);
-
-                    if (vehicleToRent == null || customerToRent == null) {
-                        System.out.println("Vehicle or customer not found.");
-                        break;
-                    }
-
-                    rentalSystem.rentVehicle(vehicleToRent, customerToRent, LocalDate.now(), rentAmount);
-                    break;
-
-                case 4:
-                	rentalSystem.displayVehicles(Vehicle.VehicleStatus.Rented);
-
-                	System.out.print("Enter license plate: ");
-                    String returnPlate = scanner.nextLine().toUpperCase();
-                    
-                	System.out.println("Registered Customers:");
-                	rentalSystem.displayAllCustomers();
-
-                    System.out.print("Enter customer ID: ");
-                    int cidReturn = scanner.nextInt();
-
-                    System.out.print("Enter any additional return fees: ");
-                    double returnFees = scanner.nextDouble();
-                    scanner.nextLine();
-
-                    Vehicle vehicleToReturn = rentalSystem.findVehicleByPlate(returnPlate);
-                    Customer customerToReturn = rentalSystem.findCustomerById(cidReturn);
-
-                    if (vehicleToReturn == null || customerToReturn == null) {
-                        System.out.println("Vehicle or customer not found.");
-                        break;
-                    }
-
-                    rentalSystem.returnVehicle(vehicleToReturn, customerToReturn, LocalDate.now(), returnFees);
-                    break;
-                    
-                case 5:
-                    rentalSystem.displayVehicles(Vehicle.VehicleStatus.Available);
-                    break;
-                
-                case 6:
-                    rentalSystem.displayRentalHistory();
-                    break;
-                    
-                case 0:
-                	scanner.close();
-                    System.exit(0);
+            } else if (choice == 5) { // Exit
+                scanner.close();
+                System.out.println("Exiting application...");
+                System.exit(0);
+            } else {
+                System.out.println("Invalid option. Please choose 1-5.");
             }
         }
     }
