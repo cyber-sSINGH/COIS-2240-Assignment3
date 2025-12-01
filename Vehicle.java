@@ -1,52 +1,54 @@
+// Vehicle.java
 public abstract class Vehicle {
-    private String licensePlate;
-    private String make;
-    private String model;
+    public enum Status {
+        Available, Held, Rented, UnderMaintenance, OutOfService
+    }
+
+    private String licensePlate; // stored uppercase
+    private String make;         // First char upper, rest lower
+    private String model;        // First char upper, rest lower
     private int year;
-    private VehicleStatus status;
+    private Status status;
 
-    public enum VehicleStatus { Available, Held, Rented, UnderMaintenance, OutOfService }
-
+    // Constructor: sets make/model/year; licensePlate empty; status Available
     public Vehicle(String make, String model, int year) {
-    	if (make == null || make.isEmpty())
-    		this.make = null;
-    	else
-    		this.make = make.substring(0, 1).toUpperCase() + make.substring(1).toLowerCase();
-    	
-    	if (model == null || model.isEmpty())
-    		this.model = null;
-    	else
-    		this.model = model.substring(0, 1).toUpperCase() + model.substring(1).toLowerCase();
-    	
+        this.make = formatName(make);
+        this.model = formatName(model);
         this.year = year;
-        this.status = VehicleStatus.Available;
-        this.licensePlate = null;
+        this.status = Status.Available;
+        this.licensePlate = "";
     }
 
+    // Default constructor
     public Vehicle() {
-        this(null, null, 0);
+        this("Unknown", "Generic", 2000);
     }
 
+    private String formatName(String s) {
+        if (s == null) return "";
+        s = s.trim();
+        if (s.isEmpty()) return "";
+        if (s.length() == 1) return s.toUpperCase();
+        return s.substring(0,1).toUpperCase() + s.substring(1).toLowerCase();
+    }
+
+    // Setters & getters
     public void setLicensePlate(String plate) {
-        this.licensePlate = plate == null ? null : plate.toUpperCase();
+        if (plate == null) plate = "";
+        this.licensePlate = plate.trim().toUpperCase();
     }
-
-    public void setStatus(VehicleStatus status) {
-    	this.status = status;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public String getLicensePlate() { return licensePlate; }
-
     public String getMake() { return make; }
-
-    public String getModel() { return model;}
-
+    public String getModel() { return model; }
     public int getYear() { return year; }
+    public Status getStatus() { return status; }
 
-    public VehicleStatus getStatus() { return status; }
-
+    // Returns the vehicle details separated by tabs: Plate\tMake\tModel\tYear\tStatus
     public String getInfo() {
-        return "| " + licensePlate + " | " + make + " | " + model + " | " + year + " | " + status + " |";
+        return getLicensePlate() + "\t" + getMake() + "\t" + getModel() + "\t" + getYear() + "\t" + getStatus();
     }
-
 }
