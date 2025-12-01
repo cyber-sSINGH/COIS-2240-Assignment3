@@ -1,0 +1,60 @@
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+import java.time.LocalDate;
+
+public class VehicleRentalTest {
+
+    RentalSystem rentalSystem;
+    Vehicle vehicle;
+    Customer customer;
+
+    @BeforeEach
+    void setUp() {
+        rentalSystem = RentalSystem.getInstance();
+        vehicle = new Car("Honda", "Civic", 2020, 5);
+        customer = new Customer("C001", "John Doe", "555-1111");
+    }
+
+    // License Plate Validation
+    @Test
+    void testLicensePlate() {
+        assertDoesNotThrow(() -> vehicle.setLicensePlate("AAA100"));
+        assertDoesNotThrow(() -> vehicle.setLicensePlate("ABC567"));
+        assertDoesNotThrow(() -> vehicle.setLicensePlate("ZZZ999"));
+
+        assertThrows(IllegalArgumentException.class, () -> vehicle.setLicensePlate(""));
+        assertThrows(IllegalArgumentException.class, () -> vehicle.setLicensePlate(null));
+        assertThrows(IllegalArgumentException.class, () -> vehicle.setLicensePlate("AAA1000"));
+        assertThrows(IllegalArgumentException.class, () -> vehicle.setLicensePlate("ZZZ99"));
+    }
+
+    // Rent / Return Vehicle Validation
+    @Test
+    void testRentAndReturnVehicle() {
+        assertTrue(vehicle.isAvailable());
+
+        assertTrue(rentalSystem.rentVehicle(vehicle, customer, LocalDate.now(), 100.0));
+        assertFalse(vehicle.isAvailable());
+        assertFalse(rentalSystem.rentVehicle(vehicle, customer, LocalDate.now(), 100.0));
+
+        assertTrue(rentalSystem.returnVehicle(vehicle, customer));
+        assertTrue(vehicle.isAvailable());
+        assertFalse(rentalSystem.returnVehicle(vehicle, customer));
+    }
+
+    // Singleton Validation
+    @Test
+    void testSingletonRentalSystem() throws Exception {
+        Constructor<RentalSystem> constructor = RentalSystem.class.getDeclaredConstructor();
+        assertEquals(Modifier.PRIVATE, constructor.getModifiers());
+
+        RentalSystem instance1 = RentalSystem.getInstance();
+        RentalSystem instance2 = RentalSystem.getInstance();
+        assertNotNull(instance1);
+        assertSame(instance1, instance2);
+    }
+}
