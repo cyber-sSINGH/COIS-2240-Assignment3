@@ -1,3 +1,4 @@
+// Minibus.java
 public class Minibus extends Vehicle implements Rentable {
     private boolean isAccessible;
 
@@ -6,20 +7,26 @@ public class Minibus extends Vehicle implements Rentable {
         this.isAccessible = isAccessible;
     }
 
+    public boolean isAccessible() {
+        return isAccessible;
+    }
+
+    // Override getInfo to include accessibility status (Yes/No)
     @Override
     public String getInfo() {
-        return super.getInfo() + " | Accessible: " + (isAccessible ? "Yes" : "No");
+        String access = isAccessible ? "Yes" : "No";
+        return super.getInfo() + "\t" + access;
     }
 
     @Override
     public void rentVehicle() {
-        setStatus(VehicleStatus.Rented);
+        setStatus(Status.Rented);
         System.out.println("Minibus " + getLicensePlate() + " has been rented.");
     }
 
     @Override
     public void returnVehicle() {
-        setStatus(VehicleStatus.Available);
+        setStatus(Status.Available);
         System.out.println("Minibus " + getLicensePlate() + " has been returned.");
     }
 }
