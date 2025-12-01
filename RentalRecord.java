@@ -1,11 +1,13 @@
+// RentalRecord.java
 import java.time.LocalDate;
 
 public class RentalRecord {
+
     private Vehicle vehicle;
     private Customer customer;
     private LocalDate recordDate;
     private double totalAmount;
-    private String recordType; // "RENT" or "RETURN"
+    private String recordType;
 
     public RentalRecord(Vehicle vehicle, Customer customer, LocalDate recordDate, double totalAmount, String recordType) {
         this.vehicle = vehicle;
@@ -15,31 +17,26 @@ public class RentalRecord {
         this.recordType = recordType;
     }
 
-    public Customer getCustomer(){
-    	return customer;
+    public Vehicle getVehicle() { 
+        return vehicle; 
     }
     
-    public Vehicle getVehicle(){
-    	return vehicle;
-    }
+    public Customer getCustomer() { return customer; }
     
     public LocalDate getRecordDate() {
         return recordDate;
     }
     
-    public double getTotalAmount() {
-        return totalAmount;
-    }
+    public double getTotalAmount() { return totalAmount; }
     
-    public String getRecordType() {
-        return recordType;
+    public String getRecordType() { 
+        return recordType; 
     }
-    
+
     @Override
     public String toString() {
-        return recordType + " | Plate: " + vehicle.getLicensePlate() + 
-               " | Customer: " + customer.getCustomerName() + 
-               " | Date: " + recordDate + 
-               " | Amount: $" + totalAmount;
+        return "[" + recordType + "] " + vehicle.getLicensePlate() + 
+               " - " + customer.getName() + " - " + recordDate + 
+               " - $" + totalAmount;
     }
 }
